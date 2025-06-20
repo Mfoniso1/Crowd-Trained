@@ -2,6 +2,8 @@ import streamlit as st
 import google.generativeai as genai
 from datetime import datetime
 import json
+import csv
+import os
 
 # Set page config
 st.set_page_config(page_title="AI Language Translator", page_icon="🌍")
@@ -45,6 +47,14 @@ if st.button("Submit Translation"):
         # Save to local file
         with open("translations.jsonl", "a", encoding="utf-8") as f:
             f.write(json.dumps(data) + "\n")
+        # Optionally save to CSV
+        csv_file = "translations.csv"
+        file_exists = os.path.isfile(csv_file)
+        with open(csv_file, mode="a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["english", "translation", "language", "timestamp"])
+            if not file_exists:
+                writer.writeheader()
+            writer.writerow(data)
 
         st.success("✅ Translation saved successfully!")
         st.session_state.phrase = get_english_word()  # Load next phrase
